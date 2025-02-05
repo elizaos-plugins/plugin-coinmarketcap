@@ -183,21 +183,23 @@ var getPrice_default = {
     "GET_TOKEN_PRICE",
     "CHECK_TOKEN_PRICE"
   ],
-  validate: async (runtime, message) => {
+  // eslint-disable-next-line
+  validate: async (runtime, _message) => {
     await validateCoinMarketCapConfig(runtime);
     return true;
   },
   description: "Get the current price of a cryptocurrency from CoinMarketCap",
   handler: async (runtime, message, state, _options, callback) => {
     elizaLogger.log("Starting CoinMarketCap GET_PRICE handler...");
-    if (!state) {
-      state = await runtime.composeState(message);
+    let currentState = state;
+    if (!currentState) {
+      currentState = await runtime.composeState(message);
     } else {
-      state = await runtime.updateRecentMessageState(state);
+      currentState = await runtime.updateRecentMessageState(currentState);
     }
     try {
       const priceContext = composeContext({
-        state,
+        state: currentState,
         template: getPriceTemplate
       });
       const content = await generateObjectDeprecated({
